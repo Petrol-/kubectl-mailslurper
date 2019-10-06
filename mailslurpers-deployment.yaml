@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cds-mailslurper
+spec:
+  replicas: 1
+  selector:
+        matchLabels: 
+          app : mailslurper
+  template:
+    metadata:
+      labels:
+        app: mailslurper
+    spec:
+      containers:
+      - name: mailslurper
+        image: adampresley/mailslurper
+        ports:
+        - containerPort: 8080
+        - containerPort: 2500   
+        - containerPort: 8085 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: slurper
+spec:
+  type: LoadBalancer
+  ports:
+  - name : ui-port
+    port: 8080
+    targetPort : 8080
+  - name : smtp-port
+    port : 2500
+    targetPort : 2500
+  - name : service-port
+    port : 8085
+    targetPort : 8085
+  selector:
+    app: mailslurper
